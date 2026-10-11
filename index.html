@@ -27,7 +27,7 @@
   .avatar { width: 104px; height: 104px; border-radius: 50%; object-fit: cover; display: block;
             margin: 4px auto 0; background: linear-gradient(135deg,#bcd6f5,#e8f0fb); }
   h1 { text-align: center; font-size: 26px; font-weight: 800; margin: 18px 0 6px; }
-  .bio { text-align: center; color: var(--sub); font-size: 14px; font-weight: 600; margin: 0; }
+  .bio { text-align: center; color: var(--sub); font-size: 14px; font-weight: 600; margin: 0 auto; max-width: 340px; line-height: 1.6; word-break: keep-all; }
   .handle { text-align: center; color: var(--sub); font-size: 14px; font-weight: 600; margin: 6px 0 14px; }
   .ig { display: block; width: 28px; margin: 0 auto 24px; color: #c13584; }
   .search { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--line);
@@ -74,7 +74,7 @@
   <a class="chat" id="chat" aria-label="DM 보내기"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><circle cx="8.5" cy="12" r=".8" fill="currentColor"/><circle cx="12" cy="12" r=".8" fill="currentColor"/><circle cx="15.5" cy="12" r=".8" fill="currentColor"/></svg></a>
 </div>
 <div class="toast" id="toast"></div>
-<script type="application/json" id="data">{"profile": {"name": "채널이름", "bio": "✈️ 한 줄 소개를 여기에 (실제 경력으로)", "handle": "my_instagram_id", "avatar": "thumbs/avatar.jpg"}, "disclosure": "📢 이 페이지의 링크는 제휴 마케팅 활동의 일환으로, 구매·예약 시 일정액의 수수료를 제공받습니다.", "notice": "📌 상품번호는 게시물 아래 '댓글'에 있어요 💙", "featured": [{"emoji": "💙", "title": "추천 숙소 모음집", "url": "https://example.com"}, {"emoji": "🧡", "title": "숙소 할인 쿠폰팩", "url": "https://example.com"}], "items": [{"no": 1, "title": "서울 근교 료칸 숙소", "platform": "여기어때", "url": "https://example.com", "thumb": "", "keywords": "온천 료칸 반려견"}, {"no": 2, "title": "루프탑 노천탕 호캉스", "platform": "아고다", "url": "https://example.com", "thumb": "", "keywords": "노천탕 서울"}, {"no": 3, "title": "산 위 인피니티풀 숙소", "platform": "쿠팡", "url": "https://example.com", "thumb": "", "keywords": "풀빌라 인피니티풀"}]}</script>
+<script type="application/json" id="data">{"profile": {"name": "트립도슨트", "bio": "전시 가이드처럼 숙소의 숨겨진 매력, 인테리어 포인트, 주변 즐길 거리를 깊이 있게 해설해 드립니다.", "handle": "tripdocent", "avatar": "thumbs/avatar.jpg"}, "disclosure": "📢 이 페이지의 링크는 제휴 마케팅 활동의 일환으로, 구매·예약 시 일정액의 수수료를 제공받습니다.", "notice": "📌 상품번호는 게시물 아래 '댓글'에 있어요 💙", "featured": [], "items": []}</script>
 <script>
 const D = JSON.parse(document.getElementById('data').textContent);
 const $ = id => document.getElementById(id);
@@ -121,6 +121,7 @@ const rows = items.map(it => {
   $('list').appendChild(a);
   return a;
 });
+if (!rows.length) { $('empty').textContent = '곧 첫 숙소가 올라와요 ✈️'; $('empty').style.display = 'block'; }
 $('q').addEventListener('input', e => {
   const q = e.target.value.trim().toLowerCase().replace(/[\[\]]/g, '');
   let n = 0;
