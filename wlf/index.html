@@ -110,11 +110,9 @@
           <div class="row"><label for="name">성명</label><input id="name" autocomplete="off" placeholder="예: 이호성"></div>
           <div class="row"><label for="rrn">실명번호</label><input id="rrn" inputmode="numeric" autocomplete="off" placeholder="13자리 (- 넣어도 됨)"><div class="msg" id="rrnMsg"></div>
             <label class="check" id="rrnOkRow" hidden style="grid-column:2"><input type="checkbox" id="rrnOk"> 번호가 맞아요, 그대로 보낼게요</label></div>
-          <div class="row"><label for="nat">국적</label><input id="nat" list="natList" value="대한민국" autocomplete="off" placeholder="목록에서 고르거나 직접 입력"></div>
-          <div class="row"><label for="job">직업</label><input id="job" list="jobList" autocomplete="off" placeholder="예: 사무직"></div>
+          <div class="row"><label for="nat">국적</label><input id="nat" autocomplete="off" placeholder="예: 대한민국"></div>
+          <div class="row"><label for="job">직업</label><input id="job" autocomplete="off" placeholder="예: 사무직"></div>
         </div>
-        <datalist id="natList"><option>대한민국</option><option>중국</option><option>일본</option><option>태국</option><option>베트남</option><option>러시아</option><option>영국</option><option>미국</option><option>캐나다</option><option>호주</option><option>뉴질랜드</option><option>독일</option><option>프랑스</option><option>대만</option><option>홍콩</option><option>필리핀</option><option>인도네시아</option><option>말레이시아</option><option>싱가포르</option><option>캄보디아</option><option>미얀마</option><option>라오스</option><option>네팔</option><option>인도</option><option>스리랑카</option><option>방글라데시</option><option>파키스탄</option><option>우즈베키스탄</option><option>카자흐스탄</option><option>키르기스스탄</option><option>몽골</option><option>우크라이나</option><option>기타</option></datalist>
-        <datalist id="jobList"><option>사무직</option><option>전문직</option><option>공무원</option><option>자영업</option><option>영업직</option><option>서비스직</option><option>생산직</option><option>주부</option><option>학생</option><option>무직</option><option>기타</option></datalist>
       </section>
     </div>
 
@@ -354,7 +352,7 @@ $('btCopy').addEventListener('click', () => {
 });
 
 function clearCustomer() {
-  $('name').value = ''; $('rrn').value = ''; $('nat').value = '대한민국'; $('job').value = ''; $('rrnOk').checked = false;
+  $('name').value = ''; $('rrn').value = ''; $('nat').value = ''; $('job').value = ''; $('rrnOk').checked = false;
   $('helper').hidden = true; $('formMsg').textContent = ''; $('copyMsg').textContent = '';
   update(); $('name').focus();
 }
