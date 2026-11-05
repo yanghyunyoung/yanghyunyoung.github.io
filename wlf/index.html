@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content="WLF 메일요청">
+<meta property="og:description" content="성명·실명번호·국적·직업만 넣으면 내 메일 계정으로 WLF거래 거절 확인 메일 창을 채워 열어 줍니다.">
+<title>WLF 메일요청</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23b4232c'/%3E%3Cpath d='M7 10h18v12H7z' fill='none' stroke='white' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='M7 10l9 7 9-7' fill='none' stroke='white' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  /* 레이아웃: 넓은 화면은 왼쪽 입력 · 오른쪽 미리보기/보내기(고정), 좁은 화면은 한 줄로 */
+  :root {
+    --bg:#eef1f4; --surface:#ffffff; --sunk:#f6f8fa; --ink:#18212b; --sub:#5a6672; --line:#d4dbe2;
+    --accent:#b4232c; --accent-ink:#ffffff; --ok:#1d7a46; --bad:#b42318; --focus:#3b6fd8; --toast:#18212b; --toast-ink:#ffffff;
+    --f-body:'IBM Plex Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    --f-mono:'IBM Plex Mono',Consolas,'Malgun Gothic',monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg:#10151a; --surface:#182028; --sunk:#131a20; --ink:#e5eaef; --sub:#98a4b0; --line:#2b3540;
+    --accent:#e0454f; --accent-ink:#ffffff; --ok:#4cc38a; --bad:#ff7a6e; --focus:#7aa2ff; --toast:#e5eaef; --toast-ink:#10151a; color-scheme:dark; } }
+  :root[data-theme="dark"] {
+    --bg:#10151a; --surface:#182028; --sunk:#131a20; --ink:#e5eaef; --sub:#98a4b0; --line:#2b3540;
+    --accent:#e0454f; --accent-ink:#ffffff; --ok:#4cc38a; --bad:#ff7a6e; --focus:#7aa2ff; --toast:#e5eaef; --toast-ink:#10151a; color-scheme:dark; }
+
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:15px; line-height:1.5; }
+  main { max-width:1040px; margin:0 auto; padding-block:28px 48px;
+         padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+  header { margin-bottom:20px; }
+  h1 { font-size:22px; margin:0 0 6px; text-wrap:balance; letter-spacing:-.01em; }
+  .lead { color:var(--sub); margin:0; max-width:62ch; }
+  .grid { display:grid; gap:16px; }
+  @media (min-width:880px) { .grid { grid-template-columns:1fr 1fr; align-items:start; } .side { position:sticky; top:calc(env(safe-area-inset-top, 0px) + 16px); } }
+  .col { display:flex; flex-direction:column; gap:16px; min-width:0; }
+  section { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px; min-width:0; }
+  h2 { font-size:13px; margin:0 0 14px; color:var(--sub); font-weight:600; letter-spacing:.04em; display:flex; gap:8px; align-items:baseline; }
+  h2 .no { font-family:var(--f-mono); color:var(--accent); }
+  h2 .note { font-weight:400; letter-spacing:0; }
+  .fields { display:flex; flex-direction:column; gap:12px; }
+  .row { display:grid; grid-template-columns:96px 1fr; gap:4px 10px; align-items:center; }
+  .row > .msg { grid-column:2; }
+  label { font-weight:600; }
+  input, select { width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:6px; font:inherit; color:var(--ink); background:var(--surface); }
+  input::placeholder { color:var(--sub); opacity:.8; }
+  #rrn { font-family:var(--f-mono); letter-spacing:.04em; }
+  input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline:2px solid var(--focus); outline-offset:1px; }
+  .msg { font-size:12.5px; min-height:0; }
+  .msg:empty { display:none; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); }
+  .check { display:flex; gap:6px; align-items:center; font-size:13px; font-weight:400; color:var(--sub); }
+  .check input { width:auto; }
+  .head-lines { display:grid; grid-template-columns:auto 1fr; gap:2px 10px; font-size:13px; margin:0 0 10px; }
+  .head-lines dt { color:var(--sub); } .head-lines dd { margin:0; overflow-wrap:anywhere; }
+  .head-lines dd.subj { font-weight:600; }
+  pre { white-space:pre-wrap; overflow-wrap:anywhere; background:var(--sunk); border:1px solid var(--line); border-radius:6px; padding:12px 14px; margin:0; font:13.5px/1.65 var(--f-body); color:var(--ink); }
+  .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .btn { flex:1 1 140px; display:inline-flex; justify-content:center; align-items:center; padding:12px 14px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--ink); font:inherit; font-weight:600; cursor:pointer; text-decoration:none; text-align:center; }
+  .btn:hover { background:var(--sunk); }
+  .btn.main { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); flex-basis:100%; font-size:16px; }
+  .btn.main:hover { filter:brightness(1.06); background:var(--accent); }
+  .small { font-size:12.5px; color:var(--sub); margin:10px 0 0; }
+  #formMsg { margin-top:10px; font-size:13.5px; font-weight:600; }
+  #helper { border-color:var(--accent); }
+  #helper p { margin:0 0 12px; font-size:14px; }
+  .copies { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; }
+  details summary { cursor:pointer; color:var(--sub); font-size:13px; font-weight:600; }
+  details .fields { margin-top:12px; }
+  #toast { position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); max-width:calc(100% - 32px);
+           background:var(--toast); color:var(--toast-ink); padding:10px 16px; border-radius:8px; font-size:14px; opacity:0; transition:opacity .2s; pointer-events:none; }
+  #toast.show { opacity:1; }
+  @media (prefers-reduced-motion: reduce) { #toast { transition:none; } }
+  @media (max-width:480px) { .row { grid-template-columns:1fr; } .row > .msg { grid-column:1; } .copies { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>WLF 메일요청</h1>
+    <p class="lead">성명 · 실명번호 · 국적 · 직업만 넣으면 <b>내 메일 계정</b>에 받는 사람·제목·본문이 채워진 메일 창이 열립니다. 그 창에서 확인하고 [보내기]를 누르세요.</p>
+  </header>
+
+  <div class="grid">
+    <div class="col">
+      <section>
+        <h2><span class="no">1</span>내 정보 <span class="note">처음 한 번만 · 이 브라우저에만 기억</span></h2>
+        <div class="fields">
+          <div class="row"><label for="who">보내는 사람</label>
+            <select id="who"><option value="">직접 입력</option></select></div>
+          <div class="row"><label for="myMail">내 메일 주소</label><input id="myMail" type="email" autocomplete="email" placeholder="예: hong.gildong@aia.com"><div class="msg bad" id="myMailMsg"></div></div>
+          <div class="row"><label for="myName">내 이름</label><input id="myName" autocomplete="name" placeholder="예: 홍길동"></div>
+          <div class="row"><label for="myTeam">소속(팀)</label><input id="myTeam" placeholder="예: 대면영업지원팀"></div>
+          <div class="row"><label for="how">메일 서비스</label>
+            <select id="how">
+              <option value="auto">자동 (메일 주소로 판단)</option>
+              <option value="o365">회사 메일 (Outlook 웹 · Microsoft 365)</option>
+              <option value="gmail">Gmail</option>
+              <option value="naver">네이버 메일</option>
+              <option value="daum">다음 메일 (한메일·카카오)</option>
+              <option value="mailto">이 PC의 기본 메일 프로그램</option>
+            </select><div class="msg" id="howMsg" style="color:var(--sub)"></div></div>
+        </div>
+      </section>
+
+      <section>
+        <h2><span class="no">2</span>고객 정보 <span class="note">매번 입력 · 저장하지 않음</span></h2>
+        <div class="fields">
+          <div class="row"><label for="name">성명</label><input id="name" autocomplete="off" placeholder="예: 이호성"></div>
+          <div class="row"><label for="rrn">실명번호</label><input id="rrn" inputmode="numeric" autocomplete="off" placeholder="13자리 (- 넣어도 됨)"><div class="msg" id="rrnMsg"></div>
+            <label class="check" id="rrnOkRow" hidden style="grid-column:2"><input type="checkbox" id="rrnOk"> 번호가 맞아요, 그대로 보낼게요</label></div>
+          <div class="row"><label for="nat">국적</label><input id="nat" list="natList" value="대한민국" autocomplete="off" placeholder="목록에서 고르거나 직접 입력"></div>
+          <div class="row"><label for="job">직업</label><input id="job" list="jobList" autocomplete="off" placeholder="예: 사무직"></div>
+        </div>
+        <datalist id="natList"><option>대한민국</option><option>중국</option><option>일본</option><option>태국</option><option>베트남</option><option>러시아</option><option>영국</option><option>미국</option><option>캐나다</option><option>호주</option><option>뉴질랜드</option><option>독일</option><option>프랑스</option><option>대만</option><option>홍콩</option><option>필리핀</option><option>인도네시아</option><option>말레이시아</option><option>싱가포르</option><option>캄보디아</option><option>미얀마</option><option>라오스</option><option>네팔</option><option>인도</option><option>스리랑카</option><option>방글라데시</option><option>파키스탄</option><option>우즈베키스탄</option><option>카자흐스탄</option><option>키르기스스탄</option><option>몽골</option><option>우크라이나</option><option>기타</option></datalist>
+        <datalist id="jobList"><option>사무직</option><option>전문직</option><option>공무원</option><option>자영업</option><option>영업직</option><option>서비스직</option><option>생산직</option><option>주부</option><option>학생</option><option>무직</option><option>기타</option></datalist>
+      </section>
+    </div>
+
+    <div class="col side">
+      <section>
+        <h2><span class="no">3</span>확인하고 보내기</h2>
+        <dl class="head-lines">
+          <dt>보내는 사람</dt><dd id="pvFrom"></dd>
+          <dt>받는 사람</dt><dd id="pvTo"></dd>
+          <dt>참조</dt><dd id="pvCc"></dd>
+          <dt>제목</dt><dd id="pvSubj" class="subj"></dd>
+        </dl>
+        <pre id="pvBody"></pre>
+        <div class="actions">
+          <a class="btn main" id="btSend" href="#" target="_blank" rel="noopener">내 메일로 보내기</a>
+          <button class="btn" type="button" id="btCopy">전체 복사</button>
+          <button class="btn" type="button" id="btClear">고객 정보 지우기</button>
+        </div>
+        <div id="formMsg" class="bad" role="alert"></div>
+        <details>
+          <summary>받는 사람 · 참조 고치기</summary>
+          <div class="fields">
+            <div class="row"><label for="to">받는 사람</label><input id="to"></div>
+            <div class="row"><label for="cc">참조</label><input id="cc"></div>
+          </div>
+          <p class="small">여러 명은 ; 로 구분합니다. <a href="#" id="resetTo">처음 값으로 되돌리기</a></p>
+        </details>
+      </section>
+
+      <section id="helper" hidden>
+        <h2 id="helperTitle">붙여넣기 도우미</h2>
+        <p id="helperText"></p>
+        <div class="copies">
+          <button class="btn" type="button" data-copy="to">① 받는 사람 복사</button>
+          <button class="btn" type="button" data-copy="cc">② 참조 복사</button>
+          <button class="btn" type="button" data-copy="subject">③ 제목 복사</button>
+          <button class="btn" type="button" data-copy="body">④ 본문 복사</button>
+        </div>
+        <div class="msg bad" id="copyMsg" style="margin-top:8px"></div>
+        <div class="actions"><button class="btn" type="button" id="helperDone">다 보냈어요 · 다음 고객 입력</button></div>
+      </section>
+    </div>
+  </div>
+</main>
+<div id="toast" role="status"></div>
+
+<script>
+const DEF_TO = 'KR.AML@aia.com; AIAK.Ubot010@aia.com';
+const DEF_CC = 'KR.PASS_H@aia.com';
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d = '') { try { const v = localStorage.getItem('wlf.' + k); return v === null ? d : v; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('wlf.' + k, v); } catch {} }
+};
+
+// 보내는 사람 목록: 고르면 메일 주소·이름·팀이 채워진다
+const SENDERS = [
+  { en: 'Park, DaWuoRa',   ko: '박다워라', mail: 'DaWuoRa.Park@aia.com' },
+  { en: 'Cha, HyeYoung',   ko: '차혜영',   mail: 'HyeYoung.Cha@aia.com' },
+  { en: 'Jung, JaeWon',    ko: '정재원',   mail: 'JaeWon.Jung@aia.com' },
+  { en: 'Yang, HyunYoung', ko: '양현영',   mail: 'HyunYoung.Yang@aia.com' },
+  { en: 'Choi, Soojin',    ko: '최수진',   mail: 'Soojin.Choi@aia.com' },
+  { en: 'Park, Sangmi',    ko: '박상미',   mail: 'Sangmi.Park@aia.com' },
+];
+const DEF_TEAM = '대면영업지원팀';
+for (const s of SENDERS) $('who').add(new Option(`${s.ko} (${s.en}) · ${s.mail}`, s.mail));
+function syncWho() {
+  const my = $('myMail').value.trim().toLowerCase();
+  $('who').value = SENDERS.some(s => s.mail.toLowerCase() === my) ? SENDERS.find(s => s.mail.toLowerCase() === my).mail : '';
+}
+$('who').addEventListener('change', () => {
+  const s = SENDERS.find(x => x.mail === $('who').value);
+  if (!s) { $('myMail').focus(); return; }
+  $('myMail').value = s.mail; $('myName').value = s.ko;
+  if (!$('myTeam').value.trim()) $('myTeam').value = DEF_TEAM;
+  for (const k of ['myMail', 'myName', 'myTeam']) store.set(k, $(k).value);
+  update(); $('name').focus();
+});
+$('myMail').addEventListener('input', syncWho);
+
+// 기억하는 칸: 내 정보 · 메일 서비스 · 받는 사람 (고객 정보는 저장 안 함)
+const kept = { myMail: '', myName: '', myTeam: '', how: 'auto', to: DEF_TO, cc: DEF_CC };
+for (const [k, d] of Object.entries(kept)) {
+  $(k).value = store.get(k, d);
+  for (const ev of ['input', 'change']) $(k).addEventListener(ev, () => { store.set(k, $(k).value); update(); });
+}
+for (const k of ['name', 'rrn', 'nat', 'job']) $(k).addEventListener('input', () => { if (k === 'rrn') $('rrnOk').checked = false; update(); });
+$('rrnOk').addEventListener('change', update);
+
+// Enter = 다음 칸, 직업 칸에서 Enter = 보내기 버튼으로
+const order = ['myMail', 'myName', 'myTeam', 'name', 'rrn', 'nat', 'job'];
+order.forEach((k, i) => $(k).addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.isComposing) return;
+  e.preventDefault();
+  (i < order.length - 1 ? $(order[i + 1]) : $('btSend')).focus();
+}));
+
+const digits = s => s.replace(/\D/g, '');
+const mailOk = s => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s);
+
+function checkRrn(d) {
+  if (!/^\d{13}$/.test(d)) return `숫자 13자리가 아닙니다 (지금 ${d.length}자리)`;
+  const cent = { 1: 1900, 2: 1900, 5: 1900, 6: 1900, 3: 2000, 4: 2000, 7: 2000, 8: 2000 }[+d[6]];
+  if (!cent) return '7번째 자리가 1~8이 아닙니다';
+  const y = cent + +d.slice(0, 2), m = +d.slice(2, 4), day = +d.slice(4, 6);
+  const dt = new Date(y, m - 1, day);
+  if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== day) return '앞 6자리 생년월일이 올바르지 않습니다';
+  return '';
+}
+
+const howName = { o365: '회사 메일(Outlook 웹)', gmail: 'Gmail', naver: '네이버 메일', daum: '다음 메일', mailto: '기본 메일 프로그램' };
+// 네이버·다음은 링크로 받는 사람·제목을 미리 채우는 기능이 없어 메일 화면만 열고 붙여넣기 도우미를 쓴다
+const homeUrl = { naver: 'https://mail.naver.com/', daum: 'https://mail.daum.net/' };
+
+function howToSend() {
+  const h = $('how').value;
+  if (h !== 'auto') return h;
+  const dom = ($('myMail').value.split('@')[1] || '').toLowerCase().trim();
+  if (dom === 'gmail.com' || dom === 'googlemail.com') return 'gmail';
+  if (dom === 'naver.com') return 'naver';
+  if (['daum.net', 'hanmail.net', 'kakao.com'].includes(dom)) return 'daum';
+  if (dom === 'nate.com') return 'mailto';
+  return 'o365';   // 회사 메일(aia.com 등)은 Microsoft 365 Outlook 웹
+}
+
+function mail() {
+  const rrn = digits($('rrn').value);
+  const name = $('name').value.trim(), nat = $('nat').value.trim(), job = $('job').value.trim();
+  const me = $('myName').value.trim() || '(내 이름)';
+  const intro = [$('myTeam').value.trim(), me].filter(Boolean).join(' ');
+  const subject = `WLF거래 거절 확인_${name}_${rrn.slice(0, 6)}`;
+  const body =
+`안녕하세요
+${intro}입니다.
+
+IMAP청약 출금 시 고객거래확인이 필요한 대상으로 팝업이 발생하여, 확인 후 해제 부탁드립니다.
+
+        1. 성명 : ${name}
+        2. 실명번호 숫자만 13자리: ${rrn}
+        3. 국적 : ${nat}
+        4. 직업 : ${job}
+
+
+감사합니다.
+${me} 드림`;
+  return { to: $('to').value.trim(), cc: $('cc').value.trim(), subject, body, rrn, name, nat, job };
+}
+
+const enc = encodeURIComponent;
+function targetUrl(m) {
+  const h = howToSend();
+  if (homeUrl[h]) return homeUrl[h];
+  const to = m.to.replace(/\s*;\s*/g, ','), cc = m.cc.replace(/\s*;\s*/g, ',');
+  if (h === 'gmail')
+    return `https://mail.google.com/mail/?view=cm&fs=1&authuser=${enc($('myMail').value.trim())}&to=${enc(to)}&cc=${enc(cc)}&su=${enc(m.subject)}&body=${enc(m.body)}`;
+  if (h === 'o365')
+    return `https://outlook.office.com/mail/deeplink/compose?to=${enc(to)}&cc=${enc(cc)}&subject=${enc(m.subject)}&body=${enc(m.body)}`;
+  return `mailto:${to}?cc=${enc(cc)}&subject=${enc(m.subject)}&body=${enc(m.body.replace(/\n/g, '\r\n'))}`;
+}
+
+function update() {
+  const m = mail(), h = howToSend();
+  const err = m.rrn ? checkRrn(m.rrn) : '';
+  $('rrnMsg').textContent = !m.rrn ? '' : err ? '✗ ' + err : '✓ 13자리 확인';
+  $('rrnMsg').className = 'msg ' + (err ? 'bad' : 'ok');
+  $('rrnOkRow').hidden = !err;
+  const my = $('myMail').value.trim();
+  $('myMailMsg').textContent = my && !mailOk(my) ? '✗ 메일 주소 형식을 확인해 주세요' : '';
+  $('howMsg').textContent = $('how').value === 'auto' && my ? `→ ${howName[h]}` : '';
+  $('pvFrom').textContent = my || '(내 메일 주소)';
+  $('pvTo').textContent = m.to;
+  $('pvCc').textContent = m.cc;
+  $('pvSubj').textContent = m.subject;
+  $('pvBody').textContent = m.body;
+  $('btSend').href = targetUrl(m);
+  $('btSend').textContent = homeUrl[h] ? `${howName[h]} 열기` : '내 메일로 보내기';
+  if ($('formMsg').textContent && !problems().length) $('formMsg').textContent = '';
+}
+
+function problems() {
+  const m = mail(), p = [], miss = [];
+  const my = $('myMail').value.trim();
+  if (!my) miss.push('내 메일 주소');
+  if (!$('myName').value.trim()) miss.push('내 이름');
+  if (!m.name) miss.push('성명');
+  if (!m.rrn) miss.push('실명번호');
+  if (!m.nat) miss.push('국적');
+  if (!m.job) miss.push('직업');
+  if (miss.length) p.push('비어 있는 칸: ' + miss.join(', '));
+  if (my && !mailOk(my)) p.push('내 메일 주소 형식이 맞지 않습니다');
+  if (m.rrn && checkRrn(m.rrn) && !$('rrnOk').checked) p.push('실명번호를 고치거나 "번호가 맞아요"에 체크해 주세요');
+  return p;
+}
+
+let toastTimer;
+function toast(t) { $('toast').textContent = t; $('toast').classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2400); }
+
+function copyText(t, msg) {
+  $('copyMsg').textContent = '';
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch {}
+    ta.remove();
+    if (ok) toast(msg); else $('copyMsg').textContent = '복사가 막혀 있습니다. 미리보기에서 글을 직접 끌어 선택해 복사해 주세요.';
+  };
+  try { navigator.clipboard.writeText(t).then(() => toast(msg), fallback); } catch { fallback(); }
+}
+
+$('btSend').addEventListener('click', e => {
+  update();
+  const p = problems();
+  if (p.length) { e.preventDefault(); $('formMsg').textContent = p.join(' · '); return; }
+  const m = mail(), h = howToSend();
+  $('helperTitle').textContent = `${m.name} 고객 · ${howName[h]}`;
+  if (homeUrl[h]) {
+    $('helperText').textContent = `새 탭에서 ${howName[h]}이(가) 열립니다. [메일쓰기]를 누른 뒤 아래 버튼을 차례로 눌러 각 칸에 붙여넣으세요(Ctrl+V). 받는 사람은 이미 복사해 두었습니다.`;
+    copyText(m.to, '받는 사람을 복사했습니다 — 받는사람 칸에 Ctrl+V');
+  } else if (h === 'mailto') {
+    $('helperText').textContent = '기본 메일 프로그램이 열리면 내용 확인 후 [보내기]를 누르세요. 아무것도 열리지 않으면 아래 버튼으로 복사해 메일에 붙여넣으세요.';
+  } else {
+    $('helperText').textContent = `새 탭에서 ${howName[h]} 메일 창이 받는 사람·제목·본문이 채워진 채로 열립니다. 확인 후 그 창에서 [보내기]를 누르세요. 창이 비어 있거나 안 열렸으면 아래 버튼으로 복사해 붙여넣으세요.`;
+  }
+  $('helper').hidden = false;
+  $('helper').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+});
+
+const copyLabel = { to: '받는 사람', cc: '참조', subject: '제목', body: '본문' };
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
+  const k = b.dataset.copy;
+  copyText(mail()[k], `${copyLabel[k]}을(를) 복사했습니다 — 메일 칸에 Ctrl+V`);
+}));
+$('btCopy').addEventListener('click', () => {
+  const m = mail();
+  copyText(`받는 사람: ${m.to}\n참조: ${m.cc}\n제목: ${m.subject}\n\n${m.body}`, '전체를 복사했습니다');
+});
+
+function clearCustomer() {
+  $('name').value = ''; $('rrn').value = ''; $('nat').value = '대한민국'; $('job').value = ''; $('rrnOk').checked = false;
+  $('helper').hidden = true; $('formMsg').textContent = ''; $('copyMsg').textContent = '';
+  update(); $('name').focus();
+}
+$('btClear').addEventListener('click', clearCustomer);
+$('helperDone').addEventListener('click', () => { clearCustomer(); toast('고객 정보를 지웠습니다'); });
+$('resetTo').addEventListener('click', e => {
+  e.preventDefault();
+  $('to').value = DEF_TO; $('cc').value = DEF_CC; store.set('to', DEF_TO); store.set('cc', DEF_CC); update();
+});
+
+syncWho();
+update();
+($('myMail').value && $('myName').value ? $('name') : $('who')).focus({ preventScroll: true });
+</script>
+</body>
+</html>
