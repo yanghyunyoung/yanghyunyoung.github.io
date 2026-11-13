@@ -56,6 +56,9 @@ dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
 .toast{min-height:1.4em;margin:0;font-size:13.5px;color:var(--muted);text-align:center}
 .close{margin:0;padding-top:22px;border-top:1px solid var(--line);font:400 15.5px/1.9 var(--serif);text-align:center;color:var(--muted)}
 .close b{display:block;color:var(--ink);font-weight:600;margin-top:10px}
+.share{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border:0;border-radius:6px;background:#1B1C1E;color:#fff;font:600 16px/1.2 var(--sans);cursor:pointer}
+.share:focus-visible{outline:2px solid #1B1C1E;outline-offset:3px}
+.share-note{margin:6px 0 0;font-size:13px;color:var(--muted);text-align:center}
 </style>
 
 <div class="wrap">
@@ -94,6 +97,11 @@ dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
         <p class="toast" id="toast" aria-live="polite"></p>
       </section>
 
+      <div>
+        <button class="share" type="button" id="kshare">카카오톡으로 부고 보내기</button>
+        <p class="share-note">누르면 카카오톡이 열리고 보낼 사람을 고를 수 있습니다.</p>
+      </div>
+
       <p class="close">마음으로 함께해 주시면 고맙겠습니다.<br>직접 연락드리지 못하고 글로 알려드리는 점<br>너그러이 양해 부탁드립니다.<b>상주 이두석 올림</b></p>
     </div>
   </article>
@@ -118,6 +126,27 @@ document.getElementById('copy').addEventListener('click', () => {
 if (Date.now() >= Date.parse('2026-11-15T13:00:00+09:00')) {
   document.querySelector('.wrap').innerHTML = '<p style="text-align:center;padding:80px 0;color:#5E6166">장례가 끝나 안내를 내렸습니다.<br>조문해 주신 모든 분께 감사드립니다.</p>';
 }
+</script>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" crossorigin="anonymous"></script>
+<script>
+(function () {
+  var URL = 'https://yanghyunyoung.github.io/bugo/';
+  try { if (window.Kakao && !Kakao.isInitialized()) Kakao.init('46dc741b4a5d9ba1d882f4e903f0872f'); } catch (e) {}
+  document.getElementById('kshare').addEventListener('click', function () {
+    if (!window.Kakao || !Kakao.isInitialized()) { alert('카카오톡 공유를 불러오지 못했습니다. 잠시 뒤 다시 눌러 주세요.'); return; }
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '[부고] 故 이종두 님',
+        description: '발인 11월 16일(월) 오전 6시 · 칠곡경북대학교병원 장례식장',
+        imageUrl: 'https://yanghyunyoung.github.io/bugo/og.png',
+        imageWidth: 1200, imageHeight: 630,
+        link: { mobileWebUrl: URL, webUrl: URL }
+      },
+      buttons: [{ title: '부고 보기', link: { mobileWebUrl: URL, webUrl: URL } }]
+    });
+  });
+})();
 </script>
 </body>
 </html>
